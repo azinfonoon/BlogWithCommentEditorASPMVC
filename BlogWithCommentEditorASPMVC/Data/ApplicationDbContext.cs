@@ -9,7 +9,7 @@ namespace BlogWithCommentEditorASPMVC.Data
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
     {
         public DbSet<AppUser> AppUsers { get; set; }
-        public DbSet<BlogPost> BlogPosts { get; set; }
+        public DbSet<BlogPst> BlogPosts { get; set; }
         public DbSet<CommentEntity> Comments { get; set; }
 
 
@@ -18,11 +18,12 @@ namespace BlogWithCommentEditorASPMVC.Data
             base.OnModelCreating(modelBuilder);
 
             // AppUser → BlogPosts
-            modelBuilder.Entity<BlogPost>()
+            modelBuilder.Entity<BlogPst>()
                 .HasOne(bp => bp.AppUser)
-                .WithMany(u => u.BlogPosts)
+                .WithMany(u => u.BlogPsts)
                 .HasForeignKey(bp => bp.AppUserId)
                 .OnDelete(DeleteBehavior.Restrict); // prevent cascade
+
 
             // AppUser → Comments
             modelBuilder.Entity<CommentEntity>()
@@ -33,7 +34,7 @@ namespace BlogWithCommentEditorASPMVC.Data
 
             // BlogPost → Comments
             modelBuilder.Entity<CommentEntity>()
-                .HasOne(c => c.BlogPost)
+                .HasOne(c => c.BlogPst)
                 .WithMany(bp=>bp.Comments)
                 .HasForeignKey(c => c.BlogPostId)
                 .OnDelete(DeleteBehavior.Cascade); // safe to cascade here

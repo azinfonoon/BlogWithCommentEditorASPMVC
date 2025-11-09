@@ -30,5 +30,6 @@ namespace BlogWithCommentEditorASPMVC.Models.Entities.Blog
         // navigation properties can be added here for relationships with other entities (e.g., comments)
         public AppUser? AppUser { get; set; }
         public List<CommentEntity> Comments { get; set; } = new List<CommentEntity>();
+       
     }
 }

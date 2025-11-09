@@ -1,4 +1,5 @@
-﻿using BlogWithCommentEditorASPMVC.Models.Entities.Comment;
+﻿using BlogWithCommentEditorASPMVC.Models.Entities.Blog;
+using BlogWithCommentEditorASPMVC.Models.Entities.Comment;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -7,6 +8,8 @@ namespace BlogWithCommentEditorASPMVC.Models.Entities.User
     [Table("AppUsers")]
     public class AppUser
     {
+        internal object blogPst;
+
         [Key]
         public Guid Id { get; set; }
 
@@ -30,7 +33,7 @@ namespace BlogWithCommentEditorASPMVC.Models.Entities.User
 
         // Navigation properties can be added here for relationships with other entities (comment)
         public List<CommentEntity> Comments { get; set; } = new List<CommentEntity>();
-        public List<BlogPost> BlogPosts { get; set; } = new List<BlogPost>();
-
+        public List<BlogPst> BlogPsts { get; set; } = new List<BlogPst>();
+       
     }
 }

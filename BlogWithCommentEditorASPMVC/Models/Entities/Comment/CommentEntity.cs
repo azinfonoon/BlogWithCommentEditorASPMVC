@@ -1,4 +1,5 @@
-﻿using BlogWithCommentEditorASPMVC.Models.Entities.User;
+﻿using BlogWithCommentEditorASPMVC.Models.Entities.Blog;
+using BlogWithCommentEditorASPMVC.Models.Entities.User;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -33,6 +34,6 @@ namespace BlogWithCommentEditorASPMVC.Models.Entities.Comment
         public Guid BlogPostId { get; set; }
 
         // Navigation property
-        public BlogPost BlogPost { get; set; }
+        public BlogPst BlogPst { get; set; }
     }
 }
