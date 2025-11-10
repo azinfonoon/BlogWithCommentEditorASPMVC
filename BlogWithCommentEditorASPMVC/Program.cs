@@ -1,5 +1,6 @@
 using BlogWithCommentEditorASPMVC.Data;
 using BlogWithCommentEditorASPMVC.Models.Entities.User;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,16 @@ namespace BlogWithCommentEditorASPMVC
 
             });
             builder.Services.AddScoped<PasswordHasher<AppUser>>();
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login"; // redirect if not logged in
+
+        // Keep cookie after browser closes
+        options.SlidingExpiration = true;
+        options.ExpireTimeSpan = TimeSpan.FromDays(30); // e.g. 30 days
+        options.Cookie.IsEssential = true;
+    });
 
 
             var app = builder.Build();
@@ -34,7 +45,7 @@ namespace BlogWithCommentEditorASPMVC
 
             app.UseHttpsRedirection();
             app.UseRouting();
-
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
