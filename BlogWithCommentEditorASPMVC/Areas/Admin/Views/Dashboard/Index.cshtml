@@ -1,0 +1,60 @@
+﻿﻿@* @model YourApp.ViewModels.DashboardViewModel *@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h2 class="mb-4">Dashboard Overview</h2>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center">
+                <h5 class="card-title">👤 Users</h5>
+                <p class="display-6 fw-bold">20</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center">
+                <h5 class="card-title">📝 Posts</h5>
+                <p class="display-6 fw-bold">300</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center">
+                <h5 class="card-title">💬 Comments</h5>
+                <p class="display-6 fw-bold">150</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="mb-3">📌 Latest Blog Posts</h4>
+<div class="list-group shadow-sm">
+    @* @foreach (var post in Model.LatestPosts)
+    {
+        <a asp-controller="BlogPosts" asp-action="Details" asp-route-id="@post.Id"
+           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            <span>@post.Title</span>
+            <small class="text-muted">@post.CreatedAt.ToString("MMM dd, yyyy")</small>
+        </a>
+    } *@
+    <a href="#"
+       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+        <span>test title</span>
+        <small class="text-muted">2025/12/6</small>
+    </a>
+    <a href="#"
+       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+        <span>test title</span>
+        <small class="text-muted">2025/12/6</small>
+    </a>
+    <a href="#"
+       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+        <span>test title</span>
+        <small class="text-muted">2025/12/6</small>
+    </a>
+</div>
