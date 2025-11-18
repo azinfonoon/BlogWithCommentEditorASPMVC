@@ -1,0 +1,117 @@
+﻿@model CreateBlogDto
+@{
+    ViewData["Title"] = "Create Blog Post";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white text-center py-3 rounded-top-4">
+                    <h3 class="mb-0">✍️ Create a New Blog Post</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data" id="blogForm">
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label fw-semibold"></label>
+                            <input asp-for="Title" class="form-control form-control-lg" placeholder="Enter a catchy title..." />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Content" class="form-label fw-semibold"></label>
+
+                            <!-- Quill editor container -->
+                            <div id="editor" style="height: 300px;"></div>
+                            <!-- Hidden field to hold HTML content -->
+                            <input type="hidden" asp-for="Content" id="Content" />
+
+                            <span asp-validation-for="Content" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Thumbnail Image</label>
+                            <input type="file" name="file" class="form-control" accept="image/*" />
+                            <small class="text-muted">Upload a JPG or PNG image (max 2MB).</small>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                                🚀 Publish Post
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+
+    <!-- Quill CSS & JS from CDN -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+    <script>
+        async function imageHandler() {
+          const input = document.createElement('input');
+          input.setAttribute('type', 'file');
+          input.setAttribute('accept', 'image/*');
+          input.click();
+
+          input.onchange = async () => {
+            const file = input.files[0];
+            if (file) {
+              try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch('/upload', {
+                  method: 'POST',
+                  body: formData
+                });
+
+                if (!response.ok) {
+                  throw new Error('Upload failed: ' + response.statusText);
+                }
+
+                const result = await response.json();
+
+                const range = quill.getSelection(true);
+                quill.insertEmbed(range.index, 'image', result.location);
+              } catch (err) {
+                console.error('Image upload error:', err);
+              }
+            }
+          };
+        }
+
+        var quill = new Quill('#editor', {
+          theme: 'snow',
+          modules: {
+            toolbar: {
+              container: [
+                [{ 'header': [1, 2, false] }],
+                ['bold', 'italic', 'underline'],
+                ['blockquote', 'code-block'],
+                ['link', 'image'], // image button
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                ['clean']
+              ],
+              handlers: {
+                image: imageHandler // 👈 pass the function reference
+              }
+            }
+          }
+        });
+
+        // Copy HTML into hidden input on form submit
+            // Ensure hidden input is updated before submit
+        document.getElementById('blogForm').addEventListener('submit', function () {
+            document.getElementById('Content').value = quill.root.innerHTML;
+        });
+
+    </script>
+}
