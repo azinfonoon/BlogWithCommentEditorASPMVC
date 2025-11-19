@@ -78,6 +78,18 @@ namespace BlogWithCommentEditorASPMVC.Areas.Admin.Controllers
                 return View(dto);
             }
         }
+
+        [HttpPost("upload")]
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> UploadImage(IFormFile file)
+        {
+
+            var fileName = SaveImage(file);
+
+            // 6. Return JSON with the file URL (Quill expects this)
+            return Ok(new { location = fileName });
+        }
+
         // Helper function
         private string SaveImage(IFormFile file, string existingPath = null)
         {

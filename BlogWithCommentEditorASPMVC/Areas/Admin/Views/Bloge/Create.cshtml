@@ -60,25 +60,20 @@
           input.setAttribute('type', 'file');
           input.setAttribute('accept', 'image/*');
           input.click();
-
           input.onchange = async () => {
             const file = input.files[0];
             if (file) {
               try {
                 const formData = new FormData();
                 formData.append('file', file);
-
                 const response = await fetch('/upload', {
                   method: 'POST',
                   body: formData
                 });
-
                 if (!response.ok) {
                   throw new Error('Upload failed: ' + response.statusText);
                 }
-
                 const result = await response.json();
-
                 const range = quill.getSelection(true);
                 quill.insertEmbed(range.index, 'image', result.location);
               } catch (err) {
@@ -87,7 +82,6 @@
             }
           };
         }
-
         var quill = new Quill('#editor', {
           theme: 'snow',
           modules: {
@@ -106,12 +100,10 @@
             }
           }
         });
-
         // Copy HTML into hidden input on form submit
             // Ensure hidden input is updated before submit
         document.getElementById('blogForm').addEventListener('submit', function () {
             document.getElementById('Content').value = quill.root.innerHTML;
         });
-
     </script>
 }
