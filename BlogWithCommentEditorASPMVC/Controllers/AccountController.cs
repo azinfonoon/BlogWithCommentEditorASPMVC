@@ -26,6 +26,7 @@ namespace BlogWithCommentEditorASPMVC.Controllers
         {
             return View();
         }
+        [HttpPost]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
             if (!ModelState.IsValid) return View(dto);
