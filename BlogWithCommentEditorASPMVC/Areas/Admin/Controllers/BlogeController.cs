@@ -18,9 +18,59 @@ namespace BlogWithCommentEditorASPMVC.Areas.Admin.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        [HttpGet]
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
-            return View();
+            try
+            {
+                if (page < 1) page = 1;
+                if (pageSize <= 0) pageSize = 10;
+
+                var query = _context.BlogPosts.AsNoTracking();
+
+                var totalItems = await query.CountAsync();
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+                // ✅ Prevent requesting a page beyond the last one
+                if (totalPages > 0 && page > totalPages)
+                {
+                    // Option 1: redirect to last valid page
+                    return RedirectToAction(nameof(Index), new { page = totalPages, pageSize });
+
+                    // Option 2: return NotFound
+                    // return NotFound();
+                }
+
+                var blogPosts = await query
+                    .OrderByDescending(bp => bp.CreatedAt)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(bg => new BlogIndexDto
+                    {
+                        Id = bg.Id,
+                        Title = bg.Title,
+                        CreatedAt = bg.CreatedAt,
+                        AuthorName = bg.AppUser.UserName,
+                    })
+                    .ToListAsync();
+
+                var viewModel = new PageBlogPostIndexViewModel
+                {
+                    BlogPosts = blogPosts,
+                    TotalItems = totalItems,
+                    Page = page,
+                    PageSize = pageSize
+                };
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception with ILogger
+                Console.WriteLine($"[Error] {ex.Message}");
+                TempData["ErrorMessage"] = "An error occurred while loading posts.";
+                return RedirectToAction("Error", "Home");
+            }
         }
         [HttpGet]
         public async Task<IActionResult> Create()
