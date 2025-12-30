@@ -1,0 +1,39 @@
+﻿
+
+@model BlogPostDetailsViewModel
+
+
+<div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body p-4">
+
+        <!-- Title -->
+        <h1 class="fw-bold mb-3">@Model.Title</h1>
+
+        <!-- Meta info -->
+        <div class="d-flex align-items-center text-muted mb-4 small">
+            <span class="me-3"><i class="bi bi-person-circle me-1"></i> @Model.AuthorName</span>
+            <span class="me-3"><i class="bi bi-calendar-event me-1"></i> @Model.CreatedAt.ToLongDateString()</span>
+            <span><i class="bi bi-chat-dots me-1"></i> @Model.CommentCount comments</span>
+        </div>
+
+        <!-- Thumbnail -->
+        <div class="text-center mb-4">
+            <img src="@Model.ImageThumbnail" alt="@Model.Title"
+                 class="img-fluid rounded-3 shadow-sm"
+                 style="max-height: 400px; object-fit: cover;" />
+        </div>
+
+        <!-- Content -->
+        <div class="blog-post-content">
+            @Html.Raw(Model.Content)
+        </div>
+
+    </div>
+</div>
+
+<!-- Back button -->
+<div class="mt-4">
+    <a asp-controller="Blog" asp-action="Index" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Posts
+    </a>
+</div>

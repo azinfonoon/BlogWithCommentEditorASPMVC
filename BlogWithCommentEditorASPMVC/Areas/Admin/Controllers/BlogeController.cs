@@ -72,6 +72,95 @@ namespace BlogWithCommentEditorASPMVC.Areas.Admin.Controllers
                 return RedirectToAction("Error", "Home");
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(Guid id)
+        {
+            try
+            {
+                var post = await _context.BlogPosts
+                    .AsNoTracking()
+                    .Where(bp => bp.Id == id)
+                    .Select(bp => new BlogPostDetailsViewModel()
+                    {
+                        Title = bp.Title,
+                        Content = bp.Content,
+                        CreatedAt = bp.CreatedAt,
+                        ImageThumbnail = bp.ImageThumbnail,
+                        AuthorName = bp.AppUser.UserName,
+                        CommentCount = bp.Comments.Count
+                    }).FirstOrDefaultAsync();
+
+                if (post == null) return NotFound();
+
+                return View(post);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            try
+            {
+                var post = await _context.BlogPosts.FindAsync(id);
+                if (post == null)
+                {
+                    TempData["ErrorMessage"] = "Could not found post";
+                    return RedirectToAction("Index");
+                }
+
+                // Delete the image file if it exists
+                if (!string.IsNullOrEmpty(post.ImageThumbnail))
+                {
+                    var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", post.ImageThumbnail.TrimStart('/'));
+                    if (System.IO.File.Exists(imagePath))
+                    {
+                        System.IO.File.Delete(imagePath);
+                    }
+                }
+
+                // Delete images inside Content
+                if (!string.IsNullOrEmpty(post.Content))
+                {
+                    var imagePaths = ExtractImagePathsFromHtml(post.Content);
+                    foreach (var imgPath in imagePaths)
+                    {
+                        var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imgPath.TrimStart('/'));
+                        if (System.IO.File.Exists(fullPath))
+                        {
+                            System.IO.File.Delete(fullPath);
+                        }
+                    }
+                }
+
+                _context.BlogPosts.Remove(post);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Post deleted successfully.";
+                return RedirectToAction("Index");
+            }
+            catch (IOException ioEx)
+            {
+                TempData["ErrorMessage"] = "There was a problem deleting associated images.";
+                return RedirectToAction("Index");
+            }
+            catch (DbUpdateException dbEx)
+            {
+                TempData["ErrorMessage"] = "Database error occurred while deleting the blog post.";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "An unexpected error occurred. Please try again later.";
+                return RedirectToAction("Index");
+            }
+        }
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -178,7 +267,26 @@ namespace BlogWithCommentEditorASPMVC.Areas.Admin.Controllers
             return "/images/" + uniqueFileName;
         }
 
-      
+        private List<string> ExtractImagePathsFromHtml(string htmlContent)
+        {
+            var imagePaths = new List<string>();
+            var regex = new Regex("<img[^>]+src=\"([^\"]+)\"", RegexOptions.IgnoreCase);
+            var matches = regex.Matches(htmlContent);
+
+            foreach (Match match in matches)
+            {
+                if (match.Groups.Count > 1)
+                {
+                    var src = match.Groups[1].Value;
+                    if (src.StartsWith("/images/")) // only delete local images
+                    {
+                        imagePaths.Add(src);
+                    }
+                }
+            }
+
+            return imagePaths;
+        }
     }
     
 }
