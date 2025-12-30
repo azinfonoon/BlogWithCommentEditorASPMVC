@@ -1,0 +1,95 @@
+﻿@model PageBlogPostIndexViewModel
+
+
+@{
+    ViewData["Title"] = "Posts";
+}
+
+@if(TempData["ErrorMessage"] != null)
+{
+    <p class="text-danger">@TempData["ErrorMessage"]</p>
+}
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <p class="text-success">@TempData["SuccessMessage"]</p>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">📝 Blog Posts</h2>
+    <a asp-controller="Bloge" asp-action="Create" class="btn btn-primary shadow-sm">➕ New Post</a>
+</div>
+
+<div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Created</th>
+                    <th style="width: 150px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Example static rows -->
+                @foreach (var post in Model.BlogPosts)
+                {
+                    <tr>
+                        <td>
+                            <div class="fw-semibold">@post.Title</div>
+                            @* <small class="text-muted d-block">This is a short preview of the content...</small> *@
+                        </td>
+                        <td>@post.AuthorName</td>
+                        <td>@post.CreatedAt</td>
+                        <td>
+                            <div class="btn-group">
+                                <a asp-controller="Bloge" asp-action="Details" asp-route-id="@post.Id" class="btn btn-sm btn-outline-secondary">View</a>
+                                <a asp-controller="Bloge" asp-action="Edit" asp-route-id="@post.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <form asp-controller="Bloge" asp-action="Delete" asp-route-id="@post.Id" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pagination -->
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(Model.Page > 1 ? "" : "disabled")">
+            <a class="page-link" asp-controller="Blog" asp-action="Index" asp-route-page="@(Model.Page - 1)">Previous</a>
+        </li>
+
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            if (i == Model.Page ||
+            i == 1 ||
+            i == Model.TotalPages ||
+            (i >= Model.Page - 2 && i <= Model.Page + 2))
+            {
+                <li class="page-item @(i == Model.Page ? "active" : "")">
+                    <a class="page-link" asp-controller="Bloge" asp-action="Index" asp-route-page="@i">@i</a>
+                </li>
+            }
+            else if ((i == Model.Page - 3 && Model.Page > 4) ||
+            (i == Model.Page + 3 && Model.Page < Model.TotalPages - 3))
+            {
+                <li class="page-item"><span class="page-dots">...</span></li>
+            }
+
+        }
+
+        <li class="page-item @(Model.Page < Model.TotalPages ? "" : "disabled")">
+            <a class="page-link" asp-controller="Bloge" asp-action="Index" asp-route-page="@(Model.Page + 1)">Next</a>
+        </li>
+    </ul>
+</nav>
